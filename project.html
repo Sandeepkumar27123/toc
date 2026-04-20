@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NFA Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 500px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 10px;
+            width: 80%;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #output {
+            margin-top: 20px;
+            text-align: left;
+            white-space: pre-line;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>NFA Simulator</h2>
+    <p>Simulates Non-deterministic Finite Automaton</p>
+
+    <input type="text" id="inputString" placeholder="Enter string (a, b)">
+    <br>
+    <button onclick="simulate()">Simulate</button>
+
+    <div id="output"></div>
+</div>
+
+<script>
+function simulate() {
+    const input = document.getElementById("inputString").value;
+    let currentStates = new Set(["q0"]);
+    let output = "Start State: {q0}\n\n";
+
+    const transitions = {
+        "q0,a": ["q0","q1"],
+        "q0,b": ["q0"],
+        "q1,b": ["q2"]
+    };
+
+    const acceptStates = ["q2"];
+
+    for (let i = 0; i < input.length; i++) {
+        let char = input[i];
+        let nextStates = new Set();
+
+        currentStates.forEach(state => {
+            let key = state + "," + char;
+            if (transitions[key]) {
+                transitions[key].forEach(s => nextStates.add(s));
+            }
+        });
+
+        output += `Step ${i+1}: {${[...currentStates]}} --(${char})--> {${[...nextStates]}}\n`;
+        currentStates = nextStates;
+    }
+
+    output += `\nFinal States: {${[...currentStates]}}\n`;
+
+    let accepted = [...currentStates].some(s => acceptStates.includes(s));
+
+    if (accepted) {
+        output += "Result: ACCEPTED ✅";
+    } else {
+        output += "Result: REJECTED ❌";
+    }
+
+    document.getElementById("output").innerText = output;
+}
+</script>
+
+</body>
+</html>
